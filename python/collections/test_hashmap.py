@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from python.dsmap.hashmap import HashMap
+from python.collections.hashmap import HashMap
 
 
 class TestHashMap(TestCase):
