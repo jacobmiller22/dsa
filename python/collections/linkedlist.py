@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 
 @dataclass
@@ -13,9 +13,16 @@ class Node:
 
 class LinkedList:
     start: Node  # Start points to a sentinal node
+    end: Node
+    _size: int
 
     def __init__(self) -> None:
         self.start = Node(val=None, next=None)
+        self.end = Node(val=None, next=None)
+        self._size = 0
+
+    def size(self) -> int:
+        return self._size
 
     def index(self, val) -> int:
         """Gives the index of the first occurance of value
@@ -32,15 +39,19 @@ class LinkedList:
             curr = curr.next
         return -1
 
-    def insert(self, val: Any, index: int = 0) -> None:
+    def _insert(self, val: Any, index: int = 0) -> None:
+        if index < 0 or index > self._size:
+            raise IndexError("Provided index out of bounds")
+
         i = 0
-        curr = self.start.next
-        while curr is not None:
+        curr = self.start
+        while curr is not self.end:
             if i == index:
-                curr = Node(val=val, next=curr)
+                curr.next = Node(val=val, next=curr.next)
+                self._size += 1
                 return
             i += 1
-            curr = curr.next
+            curr = cast(Node, curr.next)
         raise IndexError("Provided index out of bounds")
 
     def pop(self, index: int = 0) -> Any:
@@ -50,12 +61,9 @@ class LinkedList:
             if i + 1 == index:
                 val = curr.next.val
                 curr.next = curr.next.next
+                self._size -= 1
                 return val
         raise IndexError("Provided index out of bounds")
 
-    def push(self, val: Any) -> None:
-        curr = self.start
-        while curr.next is not None:
-            # Iterate until the very last element
-            curr = curr.next
-        curr.next = Node(val=val, next=None)
+    def push(self, val: Any, index: int | None = None) -> None:
+        self._insert(val, index or self._size)
